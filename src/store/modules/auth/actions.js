@@ -1,35 +1,14 @@
 export default {
 	async login(context, payload) {
-		context.dispatch("auth", {
+		return context.dispatch("auth", {
 			...payload,
 			mode: "login",
 		});
 	},
 	async signup(context, payload) {
-		const response = await fetch(
-			"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBlPue7HOFsWw6hZbExZ0u-EqcyQRqkU1I",
-			{
-				method: "POST",
-				body: JSON.stringify({
-					email: payload.email,
-					password: payload.password,
-					returnSecureToken: true,
-				}),
-			}
-		);
-		const responseData = await response.json();
-
-		if (!response.ok) {
-			console.log(responseData);
-			const error = new Error(
-				responseData.message || "Failed to authetticate. Check your login data"
-			);
-			throw error;
-		}
-		context.commit("setUser", {
-			token: responseData.idToken,
-			userId: responseData.localId,
-			tokenExpiration: responseData.expiresIn,
+		return context.dispatch("auth", {
+			...payload,
+			mode: "signup",
 		});
 	},
 	async auth(context, payload) {
@@ -57,11 +36,26 @@ export default {
 			);
 			throw error;
 		}
+
+		localStorage.setItem("token", responseData.idToken);
+		localStorage.setItem("userId", responseData.localId);
+
 		context.commit("setUser", {
 			token: responseData.idToken,
 			userId: responseData.localId,
 			tokenExpiration: responseData.expiresIn,
 		});
+	},
+	tryLogin(context) {
+		const token = localStorage.getItem("token");
+		const userId = localStorage.getItem("userId");
+		if (token && userId) {
+			context.commit("setUser", {
+				token: token,
+				userId: userId,
+				tokenExpiration: null,
+			});
+		}
 	},
 	logout(context) {
 		context.commit("setUser", {

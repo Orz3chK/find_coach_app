@@ -12,6 +12,9 @@
 	export default {
 		name: "App",
 		components: { TheHeader },
+		created() {
+			this.$store.dispatch("tryLogin");
+		},
 	};
 </script>
 
