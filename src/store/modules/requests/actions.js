@@ -24,14 +24,15 @@ export default {
 		console.log(responseData);
 
 		newRequests.id = responseData.name;
-		newRequests.coachID = payload.coachId;
 
 		context.commit("addRequests", newRequests);
 	},
 	async fetchRequests(context) {
 		const coachId = context.rootGetters.userId;
+		const token = context.rootGetters.token;
 		const response = await fetch(
-			`https://find-coach-app-74a43-default-rtdb.europe-west1.firebasedatabase.app/requests/${coachId}.json`
+			`https://find-coach-app-74a43-default-rtdb.europe-west1.firebasedatabase.app/requests/${coachId}.json?auth=` +
+				token
 		);
 		const responseData = await response.json();
 
